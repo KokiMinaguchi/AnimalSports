@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: dcefcca71288993439e0aaa29ca5fd3f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - field: {fileID: 2664146860194391396, guid: 20ddf87ae0afe664d8d9704fbfa827bd, type: 3}
+  - player: {fileID: 1112105660783214493, guid: 05c0329103d0bda4bbdc1d5737ec3179,
+      type: 3}
+  - fish: {fileID: 5189889097005947521, guid: a9dd5d113c576704d94ac89742413fd0, type: 3}
+  - nekokan: {fileID: 1529192079409483633, guid: 48f4c9cad443eb447885816ae94e0890,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
