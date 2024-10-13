@@ -16,12 +16,6 @@ public class HitPointModel : MonoBehaviour
         _hp.Value = _maxHP;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void OnDestroy()
     {
         _hp.Dispose();
