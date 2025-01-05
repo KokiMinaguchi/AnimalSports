@@ -5,15 +5,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// プレイヤー通常攻撃クラス
+/// </summary>
 [RequireComponent(typeof(PlayerInputProvider))]
 public class PlayerNormalAttack : MonoBehaviour
 {
-    private PlayerInputProvider _inputProvider;
-
-    public GameObject _target;
-
-    public bool _isGround;
-
+    #region SerializeField
 
     [SerializeField]
     [Header("弾のスピード")]
@@ -23,15 +21,33 @@ public class PlayerNormalAttack : MonoBehaviour
     [Header("発射間隔")]
     private float _bulletInterval;
 
-    private float _bulletTimer = 0.0f;
+    [SerializeField]
+    [Header("カメラが見る位置")]
+    private GameObject _aimTarget;
 
     [SerializeField]
+    [Header("弾のプレハブ")]
     private GameObject _bulletPrefab;
+
+    #endregion
+
+    #region Field
+
+    private PlayerInputProvider _inputProvider;
+
+    private Transform _transform;
+
+    private float _bulletTimer = 0.0f;
+
+    #endregion
+
+    #region Unity
 
     // Start is called before the first frame update
     void Start()
     {
         _inputProvider = GetComponent<PlayerInputProvider>();
+        _transform = GetComponent<Transform>();
 
         // 攻撃ボタンを押したときタイマーリセット
         _inputProvider.NormalAttack
@@ -50,17 +66,23 @@ public class PlayerNormalAttack : MonoBehaviour
             .AddTo(this);
     }
 
+    #endregion
+
+    #region Method
+
     private void Shot()
     {
         if (_bulletTimer > 0.0f) return;
 
         // TODO　ObjectPool
-        GameObject newbullet = Instantiate(_bulletPrefab, this.transform.position, Quaternion.identity); //弾を生成
-        newbullet.transform.position += this.transform.forward * 2f;
+        GameObject newbullet = Instantiate(_bulletPrefab, _transform.position, Quaternion.identity); //弾を生成
+        newbullet.transform.position += _transform.forward * 2f;
         Rigidbody bulletRigidbody = newbullet.GetComponent<Rigidbody>();
         newbullet.gameObject.tag = "Bullet";
-        bulletRigidbody.AddForce(_target.transform.forward * _bulletSpeed); //キャラクターが向いている方向に弾に力を加える
+        bulletRigidbody.AddForce(_aimTarget.transform.forward * _bulletSpeed); //キャラクターが向いている方向に弾に力を加える
         Destroy(newbullet, 3); //3秒後に弾を消す
         _bulletTimer = _bulletInterval;
     }
+
+    #endregion
 }

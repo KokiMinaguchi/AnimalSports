@@ -1,36 +1,65 @@
 using R3;
+using R3.Triggers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
 
+/// <summary>
+/// プレイヤー移動クラス
+/// </summary>
 [RequireComponent(typeof(PlayerInputProvider))]
-[RequireComponent (typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement2D : MonoBehaviour
 {
+    #region SerializeField
+
+    [SerializeField]
+    [Header("歩く速さ")]
+    private float _walkSpeed;
+
+    [SerializeField]
+    [Header("加速度")]
+    private Vector3 _accel;
+
+    [SerializeField, Range(1f, 20f)]
+    [Header("ジャンプ力")]
+    private float _jumpPower;
+
+    [SerializeField]
+    [Header("移動速度の入力に対する追従度")]
+    private float _moveTracking;
+
+    #endregion
+
+    #region Field
+
     private PlayerInputProvider _inputProvider;
+    private Rigidbody _rb;
+
+    #endregion
+
+
     private bool _dash;
 
-    private Rigidbody _rb;
+
     float _dragSpeed;
 
     private float _targetRotation = 0.0f;
     public float RotationSmoothTime = 0.12f;
     GameObject _mainCamera;
-    [SerializeField]
-    private float _walkSpeed;
+
     [SerializeField]
     private float _dashSpeed;
     private float _speed;
     private float _rotationVelocity;
     private float _verticalVelocity;
 
-    [SerializeField, Range(1f, 20f)]
-    private float _jumpPower;
 
 
-    public GameObject _target;
+    [SerializeField]
+    [Header("カメラが見る位置")]
+    private GameObject _aimTarget;
 
     public bool _isGround;
 
@@ -40,6 +69,8 @@ public class PlayerMovement2D : MonoBehaviour
     Vector3 _inputDirection;
     Vector3 _targetDirection;
     Vector3 _moveVelocity;
+
+    #region Unity
 
     private void Awake()
     {
@@ -51,67 +82,123 @@ public class PlayerMovement2D : MonoBehaviour
         _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         _rb = GetComponent<Rigidbody>();
         _inputProvider = GetComponent<PlayerInputProvider>();
+        _inputDirection = Vector3.zero;
+        Physics.gravity = _localGravity;
+
+        // デバッグテスト
+        //_inputProvider.Inhole.Subscribe(value => { Debug.Log("吸い込み" + value); }).AddTo(this);
 
         // 移動キーを入力していないとき
-        _inputProvider.Move.Where(value => value.magnitude <= 0.5f)
+        _inputProvider.Move
+            .Where(value => value.magnitude <= 0.4f)
             .Subscribe(_ => 
             { 
                 _speed = 0f;
+                Debug.Log("STOP");
+                //_rb.AddForce(-_rb.velocity / Time.fixedDeltaTime);
                 _dragSpeed = 5f;
-                _rb.drag = _dragSpeed;
+               _rb.drag = _dragSpeed;
                 
-            }).AddTo(this);
+            })
+            .AddTo(this);
 
         // 移動キーを入力しているとき
-        _inputProvider.Move.Where(value => value.magnitude > 0.5f)
+        _inputProvider.Move
+            .Where(value => value.magnitude > 0.5f)
             .Subscribe(_ =>
             {
                 _speed = _walkSpeed;
-                _dragSpeed = 0.9f;
+                Debug.Log("MOVE");
+                _dragSpeed = 0.0f;
                 _rb.drag = _dragSpeed;
-              //PlayerRotation();
-                
-
-            }).AddTo(this);
+                //PlayerRotation();
+            })
+            .AddTo(this);
 
         // ジャンプ
-        _inputProvider.Jump.Where(_ => _isGround == true).Subscribe(_ =>
-        {
-            Debug.Log("JUMP");
-            _verticalVelocity = _jumpPower;
-            _rb.AddForce(Vector3.up * _verticalVelocity, ForceMode.Impulse);
-            _isGround = false;
-        }).AddTo(this);
+        _inputProvider.Jump
+            .Where(_ => _isGround == true)
+            .Subscribe(_ =>
+            {
+                Debug.Log("JUMP");
+                _verticalVelocity = Mathf.Sqrt(_jumpPower * -2f * _localGravity.y);
+                //_rb.AddForce(Vector3.up * _verticalVelocity, ForceMode.Impulse);
+                _isGround = false;
+            })
+            .AddTo(this);
+
+        // 更新処理
+        this.FixedUpdateAsObservable()
+            .Subscribe(_ =>
+            {
+                //if(_inputProvider.Move.CurrentValue.magnitude > 0.5f)
+                //{
+                //    _rb.drag = 0.0f;
+                //}
+                //else
+                //{
+                //    _rb.drag = 5f;
+                //}
+
+                
+                _inputDirection = 
+                new Vector3(_inputProvider.Move.CurrentValue.x, 0, _inputProvider.Move.CurrentValue.y).normalized;
+                
+                float targetSpeed = _dash ? _dashSpeed : _walkSpeed;
+
+                if (_inputProvider.Move.CurrentValue != Vector2.zero)
+                {
+                    PlayerRotation();
+                }
+
+                _targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+                
+                //_moveVelocity = _targetDirection.normalized * _speed;
+                _moveVelocity = _inputDirection * _speed;
+                if (_isGround == false)
+                {
+                    //_rb.AddForce(_accel, ForceMode.Acceleration);
+                    //_moveVelocity = _moveVelocity * _accel.x;
+                    //finalSpeed = finalSpeed * _accel.x;
+                    //_rb.AddForce(_targetDirection.normalized * factor, ForceMode.Acceleration);
+                    //_rb.AddForce(_localGravity, ForceMode.Acceleration);
+                    _verticalVelocity += _localGravity.y * Time.fixedDeltaTime;
+                }
+                
+                //  滑る移動
+                //_rb.AddForce(new Vector3(_moveVelocity.x, _verticalVelocity, _moveVelocity.z), ForceMode.Force);
+
+                //Vector3 finalSpeed = _moveTracking * (_moveVelocity - _rb.velocity);
+
+                //Debug.Log("FinalSpeed:"+ finalSpeed);
+
+
+                //_verticalVelocity = _moveTracking * (_verticalVelocity - _rb.velocity.y);
+                //_rb.AddForce(new Vector3(_moveVelocity.x, _verticalVelocity, _moveVelocity.z), ForceMode.Force);
+                //Vector3 flatVal = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
+                //Debug.Log(flatVal);
+                //if (flatVal.magnitude > _walkSpeed)
+                //{
+                //    _rb.velocity = new Vector3(flatVal.x, _rb.velocity.y, flatVal.z);
+                //}
+                //Debug.Log(_rb.velocity);
+                // すべらない移動
+                _rb.velocity = new Vector3(_moveVelocity.x, _verticalVelocity, _moveVelocity.z);
+                
+            });
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void OnCollisionEnter(Collision collision)
     {
-        _inputDirection = 
-            _mainCamera.transform.forward * _inputProvider.Move.CurrentValue.y + 
-            _mainCamera.transform.right * _inputProvider.Move.CurrentValue.x;
-
-        float targetSpeed = _dash ? _dashSpeed : _walkSpeed;
-        
-        if (_inputProvider.Move.CurrentValue != Vector2.zero)
+        if (collision.gameObject.tag == "Ground")
         {
-            PlayerRotation();
-        }
-
-        _targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-
-        _moveVelocity = _targetDirection.normalized * (_speed * Time.fixedDeltaTime);
-        //  滑る移動
-        _rb.AddForce(new Vector3(_moveVelocity.x, _verticalVelocity, _moveVelocity.z));
-        // すべらない移動
-        //_rb.velocity = new Vector3(moveVelocity.x, _verticalVelocity, moveVelocity.z);
-
-        if (_isGround == false)
-        {
-            _rb.AddForce(_localGravity, ForceMode.Acceleration);
-            //_verticalVelocity += _localGravity.y * Time.fixedDeltaTime;
+            _isGround = true;
         }
     }
+
+    #endregion
+
+    #region Method
 
     public void OnDash(InputAction.CallbackContext context)
     {
@@ -129,15 +216,6 @@ public class PlayerMovement2D : MonoBehaviour
         Debug.Log(_dash);
     }
 
-    //public void OnJump(InputAction.CallbackContext context)
-    //{
-    //    if (context.performed == false || _isGround == false) return;
-    //    Debug.Log("Jump");
-    //    _verticalVelocity = _jumpPower;
-    //    _rb.AddForce(Vector3.up * _verticalVelocity, ForceMode.Impulse);
-    //    _isGround = false;
-    //}
-
     private void PlayerRotation()
     {
         _targetRotation = Mathf.Atan2(_inputDirection.x, _inputDirection.z) * Mathf.Rad2Deg;// +
@@ -149,11 +227,5 @@ public class PlayerMovement2D : MonoBehaviour
         transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if(collision.gameObject.tag == "Ground")
-        {
-            _isGround = true;
-        }
-    }
+    #endregion
 }

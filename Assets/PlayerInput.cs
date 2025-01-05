@@ -80,6 +80,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Inhole"",
+                    ""type"": ""Button"",
+                    ""id"": ""cd36645f-7af5-4008-98a4-9f9bb14c33b5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -225,6 +234,28 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e693eb3d-b43b-456b-a944-5ed8379f4f4c"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Inhole"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""13ee7036-a048-40de-8355-4591a1910215"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XboxController"",
+                    ""action"": ""Inhole"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -295,6 +326,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Game_Attack = m_Game.FindAction("Attack", throwIfNotFound: true);
         m_Game_Fire = m_Game.FindAction("Fire", throwIfNotFound: true);
         m_Game_Jump = m_Game.FindAction("Jump", throwIfNotFound: true);
+        m_Game_Inhole = m_Game.FindAction("Inhole", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Newaction = m_UI.FindAction("New action", throwIfNotFound: true);
@@ -365,6 +397,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_Attack;
     private readonly InputAction m_Game_Fire;
     private readonly InputAction m_Game_Jump;
+    private readonly InputAction m_Game_Inhole;
     public struct GameActions
     {
         private @PlayerInput m_Wrapper;
@@ -375,6 +408,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Attack => m_Wrapper.m_Game_Attack;
         public InputAction @Fire => m_Wrapper.m_Game_Fire;
         public InputAction @Jump => m_Wrapper.m_Game_Jump;
+        public InputAction @Inhole => m_Wrapper.m_Game_Inhole;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -402,6 +436,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @Inhole.started += instance.OnInhole;
+            @Inhole.performed += instance.OnInhole;
+            @Inhole.canceled += instance.OnInhole;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -424,6 +461,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @Inhole.started -= instance.OnInhole;
+            @Inhole.performed -= instance.OnInhole;
+            @Inhole.canceled -= instance.OnInhole;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -513,6 +553,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnAttack(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnInhole(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

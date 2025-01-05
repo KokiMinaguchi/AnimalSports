@@ -22,13 +22,7 @@ public class BlinkButtonView : MonoBehaviour
                 Debug.Log("Click!");
                 // ƒV[ƒ“‘JˆÚ
                 //SceneManagement.LoadScene(_sceneName);
-                this.transform.parent.gameObject.SetActive(false);
+                //this.transform.parent.gameObject.SetActive(false);
             }).AddTo(this);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

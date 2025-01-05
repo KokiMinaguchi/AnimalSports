@@ -11,7 +11,25 @@ namespace CommonViewParts
     [RequireComponent(typeof(ObservableEventTrigger))]
     public class CustomButton : MonoBehaviour
     {
+        #region Property
+
+        /// <summary>
+        /// ボタンのアクティブ状態を保持するReactiveProperty
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> IsActiveRP => _isActiveRP;
+        public ReadOnlyReactiveProperty<bool> IsSelectedRP => _isSelectedRP;
+
+        #endregion
+
+        #region Field
+
+        private readonly ReactiveProperty<bool> _isActiveRP = new(true);
+        private readonly ReactiveProperty<bool> _isSelectedRP = new(false);
         private ObservableEventTrigger _observableEventTrigger;
+
+        #endregion
+
+        #region Unity
 
         /// <summary>
         /// ボタンクリック時
@@ -46,15 +64,6 @@ namespace CommonViewParts
         public Observable<Unit> OnButtonSelected => _observableEventTrigger
             .OnSelectAsObservable().AsUnitObservable().Where(_ => _isSelectedRP.CurrentValue);
 
-        /// <summary>
-        /// ボタンのアクティブ状態を保持するReactiveProperty
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> IsActiveRP => _isActiveRP;
-
-        private readonly ReactiveProperty<bool> _isActiveRP = new(true);
-
-        public ReadOnlyReactiveProperty<bool> IsSelectedRP => _isSelectedRP;
-        private readonly ReactiveProperty<bool> _isSelectedRP = new(false);
 
         protected virtual void OnDestroy()
         {
@@ -66,6 +75,10 @@ namespace CommonViewParts
         {
             _observableEventTrigger = GetComponent<ObservableEventTrigger>();
         }
+
+        #endregion
+
+        #region Method
 
         /// <summary>
         /// ボタンのアクティブ状態を取得する
@@ -80,10 +93,11 @@ namespace CommonViewParts
         {
             _isActiveRP.Value = isActive;
         }
-
         public void SetSelected(bool isSelected)
         {
             _isSelectedRP.Value = isSelected;
         }
+
+        #endregion
     }
 }
