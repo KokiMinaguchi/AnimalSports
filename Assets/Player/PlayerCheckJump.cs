@@ -23,4 +23,12 @@ public class PlayerCheckJump : MonoBehaviour
     {
         _playerParameter.IsGround = false;
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "Ground")
+        {
+            _playerParameter.IsGround = true;
+        }
+    }
 }

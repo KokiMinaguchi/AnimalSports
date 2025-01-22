@@ -4,101 +4,82 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 /// <summary>
 /// プレイヤー移動クラス
 /// </summary>
 [RequireComponent(typeof(PlayerInputProvider))]
+[RequireComponent(typeof(PlayerParameter))]
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement2D : MonoBehaviour
 {
-    #region SerializeField
+    #region Field
 
-    [SerializeField]
-    [Header("歩く速さ")]
+    private bool _dash;
+
+    [SerializeField, Range(50.0f, 100.0f)]
+    [Header("移動スピード")]
     private float _walkSpeed;
 
     [SerializeField]
-    [Header("加速度")]
-    private Vector3 _accel;
+    private float _dashSpeed;
 
-    [SerializeField, Range(1f, 20f)]
+    private float _speed;
+    private float _rotationVelocity;
+
+    private float _targetRotation = 0.0f;
+    [SerializeField, Range(0.1f, 5.0f)]
+    [Header("回転速度")]
+    public float RotationSmoothTime = 0.12f;
+
+    [SerializeField]
+    private GameObject _aimTarget;
+
+    [SerializeField, Range(1.0f, 200.0f)]
     [Header("ジャンプ力")]
     private float _jumpPower;
 
     [SerializeField]
-    [Header("移動速度の入力に対する追従度")]
-    private float _moveTracking;
+    [Header("空中で自由に移動できなくするための慣性係数")]
+    private float _jumpingInertia = 1.0f;
 
-    #endregion
-
-    #region Field
-
-    private PlayerInputProvider _inputProvider;
-    private Rigidbody _rb;
-
-    #endregion
-
-
-    private bool _dash;
-
-
-    float _dragSpeed;
-
-    private float _targetRotation = 0.0f;
-    public float RotationSmoothTime = 0.12f;
-    GameObject _mainCamera;
-
-    [SerializeField]
-    private float _dashSpeed;
-    private float _speed;
-    private float _rotationVelocity;
-    private float _verticalVelocity;
-
-
-
-    [SerializeField]
-    [Header("カメラが見る位置")]
-    private GameObject _aimTarget;
-
-    public bool _isGround;
+    [SerializeField, Range(0.0f, 1.0f)]
+    [Header("減衰係数")]
+    private float _attenuation;
 
     [SerializeField]
     private Vector3 _localGravity;
 
-    Vector3 _inputDirection;
-    Vector3 _targetDirection;
-    Vector3 _moveVelocity;
+    private Rigidbody _rb;
+    private GameObject _mainCamera;
+    // 入力プロバイダ
+    private PlayerInputProvider _inputProvider;
+    // プレイヤーの各種パラメータ
+    private PlayerParameter _parameter;
 
-    #region Unity
+    #endregion
 
-    private void Awake()
-    {
-        
-    }
     // Start is called before the first frame update
     void Start()
     {
-        _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-        _rb = GetComponent<Rigidbody>();
-        _inputProvider = GetComponent<PlayerInputProvider>();
-        _inputDirection = Vector3.zero;
-        Physics.gravity = _localGravity;
+        // シーン全体の重力を設定
+        Physics.gravity = new Vector3(0, -50, 0);
 
-        // デバッグテスト
-        //_inputProvider.Inhole.Subscribe(value => { Debug.Log("吸い込み" + value); }).AddTo(this);
+        _rb = GetComponent<Rigidbody>();
+        _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+        // プレイヤー入力
+        _inputProvider = GetComponent<PlayerInputProvider>();
+        // プレイヤーの各種パラメータ
+        _parameter = GetComponent<PlayerParameter>();
 
         // 移動キーを入力していないとき
         _inputProvider.Move
             .Where(value => value.magnitude <= 0.4f)
-            .Subscribe(_ => 
-            { 
+            .Subscribe(_ =>
+            {
                 _speed = 0f;
                 Debug.Log("STOP");
-                //_rb.AddForce(-_rb.velocity / Time.fixedDeltaTime);
-                _dragSpeed = 5f;
-               _rb.drag = _dragSpeed;
-                
             })
             .AddTo(this);
 
@@ -109,21 +90,17 @@ public class PlayerMovement2D : MonoBehaviour
             {
                 _speed = _walkSpeed;
                 Debug.Log("MOVE");
-                _dragSpeed = 0.0f;
-                _rb.drag = _dragSpeed;
-                //PlayerRotation();
             })
             .AddTo(this);
 
         // ジャンプ
         _inputProvider.Jump
-            .Where(_ => _isGround == true)
+            .Where(_ => _parameter.IsGround == true)
             .Subscribe(_ =>
             {
                 Debug.Log("JUMP");
-                _verticalVelocity = Mathf.Sqrt(_jumpPower * -2f * _localGravity.y);
-                //_rb.AddForce(Vector3.up * _verticalVelocity, ForceMode.Impulse);
-                _isGround = false;
+                _rb.AddForce(Vector3.up * Mathf.Sqrt(_jumpPower * -2f * -_localGravity.y), ForceMode.Impulse);
+                _parameter.IsGround = false;
             })
             .AddTo(this);
 
@@ -131,78 +108,65 @@ public class PlayerMovement2D : MonoBehaviour
         this.FixedUpdateAsObservable()
             .Subscribe(_ =>
             {
-                //if(_inputProvider.Move.CurrentValue.magnitude > 0.5f)
+                // 入力方向計算（カメラの方向を進行方向にする）
+                Vector3 inputDirection =
+                _mainCamera.transform.forward * _inputProvider.Move.CurrentValue.y +
+                _mainCamera.transform.right * _inputProvider.Move.CurrentValue.x;
+
+                float targetSpeed = _dash ? _dashSpeed : _walkSpeed;
+                // 移動が入力されていないときは加速度を減衰させる
+                if (_inputProvider.Move.CurrentValue == Vector2.zero)
+                {
+                    _rb.velocity = new Vector3(
+                        _rb.velocity.x * _attenuation, _rb.velocity.y, _rb.velocity.z * _attenuation);
+                }
+
+                // accelerate or decelerate to target speed
+                //if (currentHorizontalSpeed < targetSpeed - speedOffset ||
+                //    currentHorizontalSpeed > targetSpeed + speedOffset)
                 //{
-                //    _rb.drag = 0.0f;
+                //    // creates curved result rather than a linear one giving a more organic speed change
+                //    // note T in Lerp is clamped, so we don't need to clamp our speed
+                //    _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
+                //        Time.deltaTime * SpeedChangeRate);
+
+                //    // round speed to 3 decimal places
+                //    _speed = Mathf.Round(_speed * 1000f) / 1000f;
                 //}
                 //else
                 //{
-                //    _rb.drag = 5f;
+                //    _speed = targetSpeed;
                 //}
 
-                
-                _inputDirection = 
-                new Vector3(_inputProvider.Move.CurrentValue.x, 0, _inputProvider.Move.CurrentValue.y).normalized;
-                
-                float targetSpeed = _dash ? _dashSpeed : _walkSpeed;
-
+                // プレイヤーが動いている間、移動方向を向くために回転する
                 if (_inputProvider.Move.CurrentValue != Vector2.zero)
                 {
-                    PlayerRotation();
+                    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg;// +
+                                                                                                      //_mainCamera.transform.eulerAngles.y;
+                    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+                        RotationSmoothTime);
+
+                    // rotate to face input direction relative to camera position
+                    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
                 }
 
-                _targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-                
-                //_moveVelocity = _targetDirection.normalized * _speed;
-                _moveVelocity = _inputDirection * _speed;
-                if (_isGround == false)
+                // ジャンプ中は慣性係数で移動を制限
+                _jumpingInertia = 1.0f;
+                if (_parameter.IsGround == false)
                 {
-                    //_rb.AddForce(_accel, ForceMode.Acceleration);
-                    //_moveVelocity = _moveVelocity * _accel.x;
-                    //finalSpeed = finalSpeed * _accel.x;
-                    //_rb.AddForce(_targetDirection.normalized * factor, ForceMode.Acceleration);
-                    //_rb.AddForce(_localGravity, ForceMode.Acceleration);
-                    _verticalVelocity += _localGravity.y * Time.fixedDeltaTime;
+                    _jumpingInertia = 0.1f;
                 }
-                
-                //  滑る移動
-                //_rb.AddForce(new Vector3(_moveVelocity.x, _verticalVelocity, _moveVelocity.z), ForceMode.Force);
 
-                //Vector3 finalSpeed = _moveTracking * (_moveVelocity - _rb.velocity);
-
-                //Debug.Log("FinalSpeed:"+ finalSpeed);
-
-
-                //_verticalVelocity = _moveTracking * (_verticalVelocity - _rb.velocity.y);
-                //_rb.AddForce(new Vector3(_moveVelocity.x, _verticalVelocity, _moveVelocity.z), ForceMode.Force);
-                //Vector3 flatVal = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
-                //Debug.Log(flatVal);
-                //if (flatVal.magnitude > _walkSpeed)
-                //{
-                //    _rb.velocity = new Vector3(flatVal.x, _rb.velocity.y, flatVal.z);
-                //}
-                //Debug.Log(_rb.velocity);
-                // すべらない移動
-                _rb.velocity = new Vector3(_moveVelocity.x, _verticalVelocity, _moveVelocity.z);
-                
-            });
+                // プレイヤー移動
+                Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+                _rb.AddForce(targetDirection.normalized * (_speed) * _jumpingInertia);
+            })
+            .AddTo(this);
     }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            _isGround = true;
-        }
-    }
-
-    #endregion
-
-    #region Method
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        switch(context.phase)
+        switch (context.phase)
         {
             case InputActionPhase.Started:
                 _dash = true;
@@ -216,16 +180,8 @@ public class PlayerMovement2D : MonoBehaviour
         Debug.Log(_dash);
     }
 
-    private void PlayerRotation()
+    public void OnAttack(InputAction.CallbackContext context)
     {
-        _targetRotation = Mathf.Atan2(_inputDirection.x, _inputDirection.z) * Mathf.Rad2Deg;// +
-                                                                                          //_mainCamera.transform.eulerAngles.y;
-        float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-            RotationSmoothTime);
-
-        // rotate to face input direction relative to camera position
-        transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+        Debug.Log(context.phase);
     }
-
-    #endregion
 }

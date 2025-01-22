@@ -9,6 +9,9 @@ TagManager:
   - Enemy
   - Bullet
   - StageFigure
+  - PanelFloor
+  - Treasure
+  - CheckPanelCollision
   layers:
   - Default
   - TransparentFX

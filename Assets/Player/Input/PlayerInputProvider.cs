@@ -15,9 +15,12 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
     public ReadOnlyReactiveProperty<bool> Jump => _jump;
     public ReadOnlyReactiveProperty<Vector2> Move => _move;
 
-    public ReadOnlyReactiveProperty<bool> Inhole => _inhole;// ãzÇ¢çûÇ›ÉAÉNÉVÉáÉì
+    public ReadOnlyReactiveProperty<bool> ClickAimTarget => _clickAimTarget;
+    public ReadOnlyReactiveProperty<bool> Fire => _fire;
     public ReadOnlyReactiveProperty<bool> NormalAttack => _normalAttack;
     public ReadOnlyReactiveProperty<bool> SpecialAttack => _specialAttack;
+    public ReadOnlyReactiveProperty<bool> OpenMenu => _openMenu;
+    public ReadOnlyReactiveProperty<bool> OpenMap => _openMap;
 
     #endregion
 
@@ -26,9 +29,13 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
     private PlayerInput _inputAction;
     private readonly ReactiveProperty<Vector2> _move = new();
     private readonly ReactiveProperty<bool> _jump = new(false);
-    private readonly ReactiveProperty<bool> _inhole = new();
+    private readonly ReactiveProperty<bool> _clickAimTarget = new(false);
+    private readonly ReactiveProperty<bool> _fire = new(false);
     private readonly ReactiveProperty<bool> _normalAttack = new();
     private readonly ReactiveProperty<bool> _specialAttack = new();
+
+    private readonly ReactiveProperty<bool> _openMenu = new(false);
+    private readonly ReactiveProperty<bool> _openMap = new(false);
 
     #endregion
 
@@ -38,24 +45,37 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
     void Awake()
     {
         _inputAction = new PlayerInput();
-
+        
         _inputAction.Game.Walk.performed += OnWalk;
         _inputAction.Game.Walk.canceled += OnWalk;
         _inputAction.Game.Jump.performed += OnJump;
         _inputAction.Game.Jump.canceled += OnJumpStop;
-        _inputAction.Game.Inhole.performed += OnInhole;
-        _inputAction.Game.Inhole.canceled += OnInholeStop;
+        _inputAction.Game.ClickAimTarget.performed += OnClickAimTarget;
+        _inputAction.Game.ClickAimTarget.canceled += OnClickAimTargetStop;
+        _inputAction.Game.Fire.performed += OnFire;
+        _inputAction.Game.Fire.canceled += OnFireStop;
         _inputAction.Game.Attack.performed += OnNormalAttack;
         _inputAction.Game.Attack.canceled += OnNormalAttackStop;
+
+        _inputAction.Game.OpenMenu.performed += OnOpenMenu;
+        _inputAction.Game.OpenMenu.canceled += OnOpenMenu;
+        _inputAction.Game.OpenMap.performed += OnOpenMap;
+        _inputAction.Game.OpenMap.canceled += OnOpenMap;
+
+        //_inputAction.UI.Click.performed += OnClick;
+        //_inputAction.UI.Click.
 
         _inputAction.AddTo(this);
         _inputAction.Enable();
 
         _move.AddTo(this);
         _jump.AddTo(this);
-        _inhole.AddTo(this);
+        _clickAimTarget.AddTo(this);
+        _fire.AddTo(this);
         _normalAttack.AddTo(this);
         _specialAttack.AddTo(this);
+        _openMenu.AddTo(this);
+        _openMap.AddTo(this);
     }
 
     void OnDestroy()
@@ -64,16 +84,25 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
         _inputAction.Game.Walk.canceled -= OnWalk;
         _inputAction.Game.Jump.performed -= OnJump;
         _inputAction.Game.Jump.canceled -= OnJumpStop;
-        _inputAction.Game.Inhole.performed -= OnInhole;
-        _inputAction.Game.Inhole.canceled -= OnInholeStop;
+        _inputAction.Game.ClickAimTarget.performed -= OnClickAimTarget;
+        _inputAction.Game.ClickAimTarget.canceled -= OnClickAimTargetStop;
+        _inputAction.Game.Fire.performed -= OnFire;
+        _inputAction.Game.Fire.canceled -= OnFireStop;
         _inputAction.Game.Attack.performed -= OnNormalAttack;
         _inputAction.Game.Attack.canceled -= OnNormalAttackStop;
-
+        _inputAction.Game.OpenMenu.performed -= OnOpenMenu;
+        _inputAction.Game.OpenMenu.canceled -= OnOpenMenu;
+        _inputAction.Game.OpenMap.performed -= OnOpenMap;
+        _inputAction.Game.OpenMap.canceled -= OnOpenMap;
+        
         _move.Dispose();
         _jump.Dispose();
-        _inhole.Dispose();
+        _clickAimTarget.Dispose();
+        _fire.Dispose();
         _normalAttack.Dispose();
         _specialAttack.Dispose();
+        _openMenu.Dispose();
+        _openMap.Dispose();
 
         _inputAction.Disable();
         _inputAction.Dispose();
@@ -96,13 +125,21 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
     {
         _jump.Value = false;
     }
-    private void OnInhole(InputAction.CallbackContext context)
+    private void OnClickAimTarget(InputAction.CallbackContext context)
     {
-        _inhole.Value = true;
+        _clickAimTarget.Value = true;
     }
-    private void OnInholeStop(InputAction.CallbackContext context)
+    private void OnClickAimTargetStop(InputAction.CallbackContext context)
     {
-        _inhole.Value = false;
+        _clickAimTarget.Value = false;
+    }
+    private void OnFire(InputAction.CallbackContext context)
+    {
+        _fire.Value = _inputAction.Game.Fire.IsPressed();
+    }
+    private void OnFireStop(InputAction.CallbackContext context)
+    {
+        _fire.Value = _inputAction.Game.Fire.IsPressed();
     }
     private void OnNormalAttack(InputAction.CallbackContext context)
     {
@@ -113,6 +150,20 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
     private void OnNormalAttackStop(InputAction.CallbackContext context)
     {
         _normalAttack.Value = false;
+    }
+
+    private void OnOpenMenu(InputAction.CallbackContext context)
+    {
+        _openMenu.Value = _inputAction.Game.OpenMenu.IsPressed();
+    }
+    private void OnOpenMap(InputAction.CallbackContext context)
+    {
+        _openMap.Value = _inputAction.Game.OpenMap.IsPressed();
+    }
+
+    private void OnClick(InputAction.CallbackContext context)
+    {
+
     }
 
     #endregion

@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
 
 /// <summary>
 /// プレイヤー移動クラス
@@ -44,9 +43,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("空中で自由に移動できなくするための慣性係数")]
     private float _jumpingInertia = 1.0f;
 
-    [SerializeField]
+    [SerializeField, Range(0.0f, 1.0f)]
     [Header("減衰係数")]
-    private float _attenuation;
+    private float _attenuation = 1.0f;
 
     [SerializeField]
     private Vector3 _localGravity;
@@ -57,9 +56,10 @@ public class PlayerMovement : MonoBehaviour
     private PlayerInputProvider _inputProvider;
     // プレイヤーの各種パラメータ
     private PlayerParameter _parameter;
-
+    //Plane plane = new Plane();
+    //float distance = 0;
     #endregion
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -94,15 +94,15 @@ public class PlayerMovement : MonoBehaviour
             .AddTo(this);
 
         // ジャンプ
-        _inputProvider.Jump
-            .Where(_ => _parameter.IsGround == true)
-            .Subscribe(_ =>
-            {
-                Debug.Log("JUMP");
-                _rb.AddForce(Vector3.up * Mathf.Sqrt(_jumpPower * -2f * -_localGravity.y), ForceMode.Impulse);
-                _parameter.IsGround = false;
-            })
-            .AddTo(this);
+        //_inputProvider.Jump
+        //    .Where(_ => _parameter.IsGround == true)
+        //    .Subscribe(_ =>
+        //    {
+        //        Debug.Log("JUMP");
+        //        _rb.AddForce(Vector3.up * Mathf.Sqrt(_jumpPower * -2f * -_localGravity.y), ForceMode.Impulse);
+        //        _parameter.IsGround = false;
+        //    })
+        //    .AddTo(this);
 
         // 更新処理
         this.FixedUpdateAsObservable()
@@ -120,7 +120,7 @@ public class PlayerMovement : MonoBehaviour
                     _rb.velocity = new Vector3(
                         _rb.velocity.x * _attenuation, _rb.velocity.y, _rb.velocity.z * _attenuation);
                 }
-                
+
                 // accelerate or decelerate to target speed
                 //if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 //    currentHorizontalSpeed > targetSpeed + speedOffset)
@@ -137,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
                 //{
                 //    _speed = targetSpeed;
                 //}
-                
+
                 // プレイヤーが動いている間、移動方向を向くために回転する
                 if (_inputProvider.Move.CurrentValue != Vector2.zero)
                 {
@@ -150,16 +150,29 @@ public class PlayerMovement : MonoBehaviour
                     transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
                 }
 
+                // カメラとマウスの位置を元にRayを準備
+                //var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                //// プレイヤーの高さにPlaneを更新して、カメラの情報を元に地面判定して距離を取得
+                //plane.SetNormalAndPosition(Vector3.up, transform.localPosition);
+                //if (plane.Raycast(ray, out distance))
+                //{
+                //    // 距離を元に交点を算出して、交点の方を向く
+                //    var lookPoint = ray.GetPoint(distance);
+                //    transform.LookAt(lookPoint);
+                //}
                 // ジャンプ中は慣性係数で移動を制限
                 _jumpingInertia = 1.0f;
-                if (_parameter.IsGround == false)
-                {
-                    _jumpingInertia = 0.1f;
-                }
+                //if (_parameter.IsGround == false)
+                //{
+                //    _jumpingInertia = 0.1f;
+                //}
 
                 // プレイヤー移動
+                //Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
                 Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
                 _rb.AddForce(targetDirection.normalized * (_speed) * _jumpingInertia);
+                //_rb.AddForce(new Vector3(inputDirection.x, 0, inputDirection.z) * (_speed) * _jumpingInertia);
             })
             .AddTo(this);
     }
