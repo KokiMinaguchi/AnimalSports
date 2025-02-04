@@ -44,8 +44,8 @@ namespace SleepingAnimals
                 {
                     _image.sprite = _audioOFF;
                 }
-            }
-            ).AddTo(this);
+            })
+            .AddTo(this);
         }
     }
 }
