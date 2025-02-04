@@ -5,50 +5,52 @@ using UnityEngine;
 
 namespace SleepingAnimals
 {
+    /// <summary>
+    /// ステージパネルを点灯、消灯する
+    /// </summary>
     public class LightUpPanel : MonoBehaviour
     {
         [SerializeField]
         private Tag _tag;
 
         [SerializeField]
-        private Material _normalMaterial;
+        [Header("点灯前のマテリアル")]
+        private Color _normalColor = new Color(0.47f, 0.47f, 0.47f, 1.0f);
 
         [SerializeField]
-        Material _lightUpMaterial;
+        [Header("点灯後のマテリアル")]
+        private Color _lightUpColor;
 
+        // パネルが点灯しているか
         private bool _isLightUp = false;
-        // Start is called before the first frame update
-        void Start()
-        {
 
-        }
+        public bool IsLightUp { get { return _isLightUp; } }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+        //private void Start()
+        //{
+        //    // debug
+        //    this.GetComponent<MeshRenderer>().material.color = _lightUpColor;
+        //}
 
         private void OnTriggerEnter(Collider other)
         {
-            //Debug.Log(other.gameObject.tag);
             if (other.gameObject.CompareTag(_tag.Name))
             {
-                //Material material = other.gameObject.GetComponent<MeshRenderer>().material;
-                //Debug.Log(material.ToString());
-                //Debug.Log(other.gameObject.GetComponent<MeshRenderer>().material.name);
-                //Debug.Log(_tag.Name);
+                Material material = this.GetComponent<MeshRenderer>().material;
+                // パネルを踏んだらマテリアルを変更
                 if (_isLightUp)
                 {
-                    this.gameObject.GetComponent<MeshRenderer>().material = _normalMaterial;
-                    //other.gameObject.GetComponent<MeshRenderer>().material = _normalMaterial;
+                    // パネルを消灯
+                    material.color = _normalColor;
+                    material.SetFloat("_Metallic", 0.0f);
                     Debug.Log("lightnormal");
                     _isLightUp = false;
                 }
                 else
                 {
-                    this.gameObject.GetComponent<MeshRenderer>().material = _lightUpMaterial;
-                    //other.gameObject.GetComponent<MeshRenderer>().material = _lightUpMaterial;
+                    // パネルを点灯
+                    material.color = _lightUpColor;
+                    //material.SetFloat("_Metallic", 1.0f);
                     _isLightUp = true;
                 }
             }

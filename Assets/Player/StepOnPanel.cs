@@ -15,7 +15,7 @@ public class StepOnPanel : MonoBehaviour
     [SerializeField]
     Material _lightUpMaterial;
 
-    private bool _isLightUp = false;
+    //private bool _isLightUp = false;
     // Start is called before the first frame update
     void Start()
     {
