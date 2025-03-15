@@ -1,41 +1,43 @@
-using CommonViewParts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using R3;
 using DG.Tweening;
-//using DG.Tweening;
 
-[RequireComponent(typeof(CustomButton))]
-public class BlinkButtonView : MonoBehaviour
+namespace SleepingAnimals
 {
-    private CustomButton _button;
-    [SerializeField]
-    string _sceneName;
-
-    public CanvasGroup _canvasGroup;
-    // Start is called before the first frame update
-    void Start()
+    [RequireComponent(typeof(CustomButton))]
+    public class BlinkButtonView : BaseButton
     {
-        _button = GetComponent<CustomButton>();
+        [SerializeField]
+        float _duration;
 
-        _button.OnButtonPressed.AsObservable().
-            Subscribe(_ =>
-            {
-                transform.DOScale(0.95f, 0.24f).SetEase(Ease.OutCubic);
-                _canvasGroup.DOFade(0.8f, 0.24f).SetEase(Ease.OutCubic);
-                // ƒV[ƒ“‘JˆÚ
-                //SceneManagement.LoadScene(_sceneName);
-                //this.transform.parent.gameObject.SetActive(false);
-            })
-            .AddTo(this);
+        [SerializeField]
+        float _tweenScaleValue;
 
-        _button.OnButtonReleased.AsObservable()
-            .Subscribe(_ =>
-            {
-                transform.DOScale(1f, 0.24f).SetEase(Ease.OutCubic);
-                _canvasGroup.DOFade(1f, 0.24f).SetEase(Ease.OutCubic);
-            })
-            .AddTo(this);
+        private RectTransform _transform;
+        private float _scale;
+
+        // Start is called before the first frame update
+        protected override void Start()
+        {
+            base.Start();
+            _transform = GetComponent<RectTransform>();
+            _scale = _transform.localScale.x;
+
+            _button.OnButtonPressed.AsObservable().
+                Subscribe(_ =>
+                {
+                    _transform.DOScale(_tweenScaleValue, _duration).SetEase(Ease.OutCubic);
+                })
+                .AddTo(this);
+
+            _button.OnButtonReleased.AsObservable()
+                .Subscribe(_ =>
+                {
+                    transform.DOScale(_scale, _duration).SetEase(Ease.OutCubic);
+                })
+                .AddTo(this);
+        }
     }
 }

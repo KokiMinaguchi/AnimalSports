@@ -9,6 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/ResidentScene.unity
     guid: 99dfc196113b62f4bb2a46391a26fdff
   - enabled: 1
+    path: Assets/Scenes/TitleScene_bingo.unity
+    guid: c937940ad5d94034c939048700972ee5
+  - enabled: 1
+    path: Assets/Scenes/GameScene.unity
+    guid: 01ad2f5a95b89a74eb26e518ad561e2e
+  - enabled: 1
+    path: Assets/Scenes/ResultScene.unity
+    guid: f02e58fd60d538a45975fda31099eb7e
+  - enabled: 1
     path: Assets/Scenes/TitleScene.unity
     guid: f39fb599660d06f4d890810014d004a8
   - enabled: 1

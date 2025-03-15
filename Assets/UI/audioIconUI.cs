@@ -1,4 +1,3 @@
-using CommonViewParts;
 using R3;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,9 +10,8 @@ namespace SleepingAnimals
     /// âπó É{É^ÉìUIÇÃêÿÇËë÷Ç¶
     /// </summary>
     [RequireComponent(typeof(CustomButton))]
-    public class audioIconUI : MonoBehaviour
+    public class audioIconUI : BaseButton
     {
-        private CustomButton _button;
         private Image _image;
 
         public bool _isPlayAudio = true;
@@ -27,9 +25,9 @@ namespace SleepingAnimals
         private Sprite _audioOFF;
 
         // Start is called before the first frame update
-        void Start()
+        protected override void Start()
         {
-            _button = GetComponent<CustomButton>();
+            base.Start();
             _image = GetComponent<Image>();
 
             _button.OnButtonClicked.AsObservable().Subscribe(_ =>

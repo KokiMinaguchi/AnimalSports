@@ -3,7 +3,7 @@ using R3;
 using R3.Triggers;
 using UnityEngine;
 
-namespace CommonViewParts
+namespace SleepingAnimals
 {
     /// <summary>
     /// ”Ä—pƒ{ƒ^ƒ“

@@ -1,4 +1,3 @@
-using CommonViewParts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,10 +10,8 @@ namespace SleepingAnimals
     /// <summary>
     /// ゲームスタートボタン処理実装
     /// </summary>
-    [RequireComponent(typeof(CustomButton))]
-    public class GameStartButtonView : MonoBehaviour
+    public class GameStartButtonView : BaseButton
     {
-        private CustomButton _button;
         private RectTransform _rectTransform;
 
         [SerializeField]
@@ -36,9 +33,9 @@ namespace SleepingAnimals
         private float _fadeTime;
 
         // Start is called before the first frame update
-        void Start()
+        protected override void Start()
         {
-            _button = GetComponent<CustomButton>();
+            base.Start();
             _rectTransform = GetComponent<RectTransform>();
 
             // 点滅処理

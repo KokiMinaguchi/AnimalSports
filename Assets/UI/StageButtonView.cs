@@ -1,4 +1,3 @@
-using CommonViewParts;
 using R3;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,16 +6,14 @@ using DG.Tweening;
 
 namespace SleepingAnimals
 {
-    [RequireComponent(typeof(CustomButton))]
-    public class StageButtonView : MonoBehaviour
+    public class StageButtonView : BaseButton
     {
-        private CustomButton _button;
         private RectTransform _rectTransform;
 
         // Start is called before the first frame update
-        void Start()
+        protected override void Start()
         {
-            _button = GetComponent<CustomButton>();
+            base.Start();
             _rectTransform = GetComponent<RectTransform>();
 
             _button.OnButtonPressed

@@ -21,6 +21,7 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
     public ReadOnlyReactiveProperty<bool> SpecialAttack => _specialAttack;
     public ReadOnlyReactiveProperty<bool> OpenMenu => _openMenu;
     public ReadOnlyReactiveProperty<bool> OpenMap => _openMap;
+    public ReadOnlyReactiveProperty<bool> OpenBox => _openBox;
 
     #endregion
 
@@ -36,6 +37,7 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
 
     private readonly ReactiveProperty<bool> _openMenu = new(false);
     private readonly ReactiveProperty<bool> _openMap = new(false);
+    private readonly ReactiveProperty<bool> _openBox = new(false);
 
     #endregion
 
@@ -61,6 +63,8 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
         _inputAction.Game.OpenMenu.canceled += OnOpenMenu;
         _inputAction.Game.OpenMap.performed += OnOpenMap;
         _inputAction.Game.OpenMap.canceled += OnOpenMap;
+        _inputAction.Game.OpenBox.performed += OnOpenBox;
+        _inputAction.Game.OpenBox.canceled += OnOpenBox;
 
         //_inputAction.UI.Click.performed += OnClick;
         //_inputAction.UI.Click.
@@ -76,6 +80,7 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
         _specialAttack.AddTo(this);
         _openMenu.AddTo(this);
         _openMap.AddTo(this);
+        _openBox.AddTo(this);
     }
 
     void OnDestroy()
@@ -94,7 +99,9 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
         _inputAction.Game.OpenMenu.canceled -= OnOpenMenu;
         _inputAction.Game.OpenMap.performed -= OnOpenMap;
         _inputAction.Game.OpenMap.canceled -= OnOpenMap;
-        
+        _inputAction.Game.OpenBox.performed -= OnOpenBox;
+        _inputAction.Game.OpenBox.canceled -= OnOpenBox;
+
         _move.Dispose();
         _jump.Dispose();
         _clickAimTarget.Dispose();
@@ -103,6 +110,7 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
         _specialAttack.Dispose();
         _openMenu.Dispose();
         _openMap.Dispose();
+        _openBox.Dispose();
 
         _inputAction.Disable();
         _inputAction.Dispose();
@@ -160,7 +168,10 @@ internal sealed class PlayerInputProvider : MonoBehaviour, IPlayerInputProvider
     {
         _openMap.Value = _inputAction.Game.OpenMap.IsPressed();
     }
-
+    private void OnOpenBox(InputAction.CallbackContext context)
+    {
+        _openBox.Value = _inputAction.Game.OpenBox.IsPressed();
+    }
     private void OnClick(InputAction.CallbackContext context)
     {
 

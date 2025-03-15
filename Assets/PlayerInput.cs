@@ -107,6 +107,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenBox"",
+                    ""type"": ""Button"",
+                    ""id"": ""f6f1cf06-aa39-431f-b73c-b4515f00eb0a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -294,6 +303,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""OpenMap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""624223d0-759f-4704-8281-6501ad8de893"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""OpenBox"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -857,6 +877,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Game_ClickAimTarget = m_Game.FindAction("ClickAimTarget", throwIfNotFound: true);
         m_Game_OpenMenu = m_Game.FindAction("OpenMenu", throwIfNotFound: true);
         m_Game_OpenMap = m_Game.FindAction("OpenMap", throwIfNotFound: true);
+        m_Game_OpenBox = m_Game.FindAction("OpenBox", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -939,6 +960,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_ClickAimTarget;
     private readonly InputAction m_Game_OpenMenu;
     private readonly InputAction m_Game_OpenMap;
+    private readonly InputAction m_Game_OpenBox;
     public struct GameActions
     {
         private @PlayerInput m_Wrapper;
@@ -952,6 +974,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @ClickAimTarget => m_Wrapper.m_Game_ClickAimTarget;
         public InputAction @OpenMenu => m_Wrapper.m_Game_OpenMenu;
         public InputAction @OpenMap => m_Wrapper.m_Game_OpenMap;
+        public InputAction @OpenBox => m_Wrapper.m_Game_OpenBox;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -988,6 +1011,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @OpenMap.started += instance.OnOpenMap;
             @OpenMap.performed += instance.OnOpenMap;
             @OpenMap.canceled += instance.OnOpenMap;
+            @OpenBox.started += instance.OnOpenBox;
+            @OpenBox.performed += instance.OnOpenBox;
+            @OpenBox.canceled += instance.OnOpenBox;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -1019,6 +1045,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @OpenMap.started -= instance.OnOpenMap;
             @OpenMap.performed -= instance.OnOpenMap;
             @OpenMap.canceled -= instance.OnOpenMap;
+            @OpenBox.started -= instance.OnOpenBox;
+            @OpenBox.performed -= instance.OnOpenBox;
+            @OpenBox.canceled -= instance.OnOpenBox;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -1183,6 +1212,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnClickAimTarget(InputAction.CallbackContext context);
         void OnOpenMenu(InputAction.CallbackContext context);
         void OnOpenMap(InputAction.CallbackContext context);
+        void OnOpenBox(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

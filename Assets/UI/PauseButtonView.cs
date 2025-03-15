@@ -1,4 +1,3 @@
-using CommonViewParts;
 using DG.Tweening;
 using R3;
 using System.Collections;
@@ -7,20 +6,17 @@ using UnityEngine;
 
 namespace SleepingAnimals
 {
-    [RequireComponent(typeof(CustomButton))]
-    public class PauseButtonView : MonoBehaviour
+    public class PauseButtonView : BaseButton
     {
-        private CustomButton _button;
         private RectTransform _rectTransform;
 
         [SerializeField]
         CanvasGroup _pauseCanvas;
 
         // Start is called before the first frame update
-        void Start()
+        protected override void Start()
         {
-            _button = GetComponent<CustomButton>();
-
+            base.Start();
             _button.OnButtonPressed
                 .AsObservable()
                 .Subscribe(_ =>

@@ -18,6 +18,7 @@ public interface IPlayerInputProvider
     public ReadOnlyReactiveProperty<bool> NormalAttack { get; }
     public ReadOnlyReactiveProperty<bool> SpecialAttack { get; }
     public ReadOnlyReactiveProperty<bool> OpenMap { get; }
+    public ReadOnlyReactiveProperty<bool> OpenBox { get; }
 
     #endregion
 }
