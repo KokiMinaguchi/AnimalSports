@@ -2,6 +2,7 @@ using R3;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace SleepingAnimals
 {
@@ -22,15 +23,11 @@ namespace SleepingAnimals
         [SerializeField]
         private PlayerInputProvider _inputProvider;
 
-        private void Start()
-        {
-            //_inputProvider.OpenBox
-            //    .Where(value => value == true)
-            //    .Subscribe(_ =>
-            //    {
+        [SerializeField]
+        private GameObject _woodenBox_break;
 
-            //    })
-        }
+        [SerializeField]
+        private GameObject _explosion;
 
         private void OnCollisionStay(Collision collision)
         {
@@ -64,12 +61,15 @@ namespace SleepingAnimals
                             break;
 
                         case ItemInfo.ItemType.Bomb:
-                            Instantiate(_item[(int)ItemInfo.ItemType.Bomb], this.transform.position, Quaternion.identity);
+                            //Instantiate(_item[(int)ItemInfo.ItemType.Bomb], this.transform.position, Quaternion.identity);
+
                             // ゲームオーバー。シーン遷移する
+                            var explosion = Instantiate(_explosion, this.transform.position, Quaternion.identity);
+                            explosion.GetComponent<VisualEffect>().Play();
                             //SceneTransitionManager.Instance.ChangeScene("ResultScene");
                             break;
                     }
-                    
+                    Instantiate(_woodenBox_break, this.transform.position, Quaternion.identity);
                     // 木箱の位置にアイテムを生成してから木箱削除
                     Destroy(this.gameObject);
                     
