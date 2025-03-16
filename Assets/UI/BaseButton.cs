@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SleepingAnimals
 {
+    /// <summary>
+    /// 汎用ボタンを使用したベースボタンクラス
+    /// </summary>
     [RequireComponent(typeof(CustomButton))]
     public class BaseButton : MonoBehaviour
     {

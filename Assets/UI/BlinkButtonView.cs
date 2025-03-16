@@ -10,10 +10,13 @@ namespace SleepingAnimals
     public class BlinkButtonView : BaseButton
     {
         [SerializeField]
-        float _duration;
+        [Header("UIのスケール値の遷移時間")]
+        private float _duration;
 
         [SerializeField]
-        float _tweenScaleValue;
+        [Range(0.1f, 2.0f)]
+        [Header("押したときのUIのスケール")]
+        private float _tweenScaleValue;
 
         private RectTransform _transform;
         private float _scale;
@@ -23,12 +26,13 @@ namespace SleepingAnimals
         {
             base.Start();
             _transform = GetComponent<RectTransform>();
+            // 初期のスケール値を保存
             _scale = _transform.localScale.x;
 
             _button.OnButtonPressed.AsObservable().
                 Subscribe(_ =>
                 {
-                    _transform.DOScale(_tweenScaleValue, _duration).SetEase(Ease.OutCubic);
+                    _transform.DOScale(_scale * _tweenScaleValue, _duration).SetEase(Ease.OutCubic);
                 })
                 .AddTo(this);
 

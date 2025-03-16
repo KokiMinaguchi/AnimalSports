@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SleepingAnimals
 {
+    /// <summary>
+    /// ƒAƒCƒeƒ€î•ñ
+    /// </summary>
     public class ItemInfo
     {
         public enum ItemType

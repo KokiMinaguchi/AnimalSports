@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/ResidentScene.unity
     guid: 99dfc196113b62f4bb2a46391a26fdff
   - enabled: 1
-    path: Assets/Scenes/TitleScene_bingo.unity
+    path: Assets/Scenes/TitleScene.unity
     guid: c937940ad5d94034c939048700972ee5
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
@@ -17,25 +17,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ResultScene.unity
     guid: f02e58fd60d538a45975fda31099eb7e
-  - enabled: 1
-    path: Assets/Scenes/TitleScene.unity
-    guid: f39fb599660d06f4d890810014d004a8
-  - enabled: 1
-    path: Assets/Scenes/StageSelectScene.unity
-    guid: 228d34770f7b6734497e19d3e5d5e3a4
-  - enabled: 1
-    path: Assets/Scenes/Stage01.unity
-    guid: e7c6bad9f5a899d4bacb85989fa65c92
-  - enabled: 1
-    path: Assets/Scenes/Stage02.unity
-    guid: b0393f2f3141ef447b2abaae1a0016dc
-  - enabled: 1
-    path: Assets/Scenes/Stage03.unity
-    guid: 870237f60e20a134093a73838762626f
-  - enabled: 1
-    path: Assets/Scenes/Stage04.unity
-    guid: b2f34ec34f780cb49935c0b20f25f120
-  - enabled: 1
-    path: Assets/Scenes/Stage05.unity
-    guid: 9e769275d0e5c3746918340ef2dd979a
   m_configObjects: {}

@@ -11,51 +11,34 @@ namespace SleepingAnimals
     public class PopUpImage : MonoBehaviour
     {
         [SerializeField]
+        [Header("ゲームシーンカメラ")]
+        private Camera _mainCamera;
+
+        [SerializeField]
+        [Header("操作UIのキャンバスグループ")]
         private CanvasGroup _canvasGroup;
 
         [SerializeField]
-        GameObject _player;
+        [Header("プレイヤー座標")]
+        private GameObject _player;
+
+        [SerializeField]
+        [Header("操作UIをプレイヤー基準でどれだけ移動させるか")]
+        private Vector3 offset;
 
         private RectTransform _transform;
 
-        [SerializeField]
-        private Vector3 offset;
-
-        [SerializeField]
-        [Header("表示切り替えされる対象のオブジェクト")]
-        private Tag _hitTag;
-
         private void Start()
         {
-            //_canvasGroup = _canvasGroup.GetComponent<CanvasGroup>();
             _transform = GetComponent<RectTransform>();
             _canvasGroup.alpha = 0.0f;
         }
 
         void Update()
         {
+            // 操作UIをプレイヤーの横に移動させる
             _transform.position
-                = RectTransformUtility.WorldToScreenPoint(Camera.main, _player.transform.position + offset);
+                = RectTransformUtility.WorldToScreenPoint(_mainCamera, _player.transform.position + offset);
         }
-
-        /// <summary>
-        /// 対象のオブジェクトに当たったらUIの表示切り替え
-        /// </summary>
-        /// <param name="collision"></param>
-        //private void OnCollisionEnter(Collision collision)
-        //{
-        //    if (collision.gameObject.CompareTag(_hitTag.Name))
-        //    {
-        //        _canvasGroup.alpha = 1.0f;
-        //    }
-        //}
-
-        //private void OnCollisionExit(Collision collision)
-        //{
-        //    if (collision.gameObject.CompareTag(_hitTag.Name))
-        //    {
-        //        _canvasGroup.alpha = 0.0f;
-        //    }
-        //}
     }
 }

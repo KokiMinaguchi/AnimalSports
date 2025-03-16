@@ -7,6 +7,9 @@ using UnityEditor;
 
 namespace SleepingAnimals.Core
 {
+    /// <summary>
+    /// É^ÉO
+    /// </summary>
     [Serializable]
     public struct Tag
     {

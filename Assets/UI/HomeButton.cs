@@ -15,10 +15,12 @@ namespace SleepingAnimals
         {
             base.Start();
 
-            _button.OnButtonClicked.AsObservable().Subscribe(button =>
+            _button.OnButtonClicked
+                .AsObservable()
+                .Subscribe(_ =>
             {
                 // ƒ^ƒCƒgƒ‹‰æ–Ê‚É–ß‚é
-                SceneTransitionManager.Instance.ChangeScene("TitleScene_bingo");
+                SceneTransitionManager.Instance.ChangeScene("TitleScene");
             })
             .AddTo(this);
         }

@@ -8,9 +8,11 @@ namespace SleepingAnimals
     public class ScorePresenter : MonoBehaviour
     {
         [SerializeField]
+        [Header("スコア処理")]
         private ScoreModel _scoreModel;
 
         [SerializeField]
+        [Header("スコア表示")]
         private ScoreView _scoreView;
 
         // Start is called before the first frame update
@@ -18,7 +20,7 @@ namespace SleepingAnimals
         {
             _scoreModel.Score.Subscribe(score =>
             {
-                //score = _scoreModel.Score.CurrentValue;
+                // スコアをセット
                 _scoreView.SetText(_scoreModel.PreScore.CurrentValue, _scoreModel.Score.CurrentValue);
 
             }).AddTo(this);
