@@ -28,21 +28,21 @@ public class soundTest : MonoBehaviour
 
     public void PlayBGM()
     {
-        SoundManager.Instance.PlayBGM(SoundManager.bgm000);
+        SoundManager.Instance.PlayBGM(SoundManager.titleBGM);
         //SoundManager.Instance.(SoundManager.bgm000);
 
     }
 
     public void StopBGM()
     {
-        SoundManager.Instance.StopBGM(SoundManager.bgm000);
+        //SoundManager.Instance.StopBGM(SoundManager.bgm000);
     }
     public void PauseBGM()
     {
-        SoundManager.Instance.PauseBGM(SoundManager.bgm000);
+        //SoundManager.Instance.PauseBGM(SoundManager.bgm000);
     }
     public void UnPauseBGM()
     {
-        SoundManager.Instance.UnPauseBGM(SoundManager.bgm000);
+        //SoundManager.Instance.UnPauseBGM(SoundManager.bgm000);
     }
 }

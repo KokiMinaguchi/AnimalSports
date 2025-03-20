@@ -88,11 +88,15 @@ namespace SleepingAnimals
                             // 爆発エフェクト再生
                             explosion.GetComponent<VisualEffect>().Play();
                             explosion.transform.parent = null;
+                            // 爆発SE再生
+                            SoundManager.Instance.PlaySE(SoundManager.explosion);
                             break;
                     }
 
                     // 木箱破壊用オブジェクトを生成
                     Instantiate(_woodenBox_break, this.transform.position, Quaternion.identity);
+                    // 木箱破壊SE再生
+                    SoundManager.Instance.PlaySE(SoundManager.woodClash);
 
                     // 破壊前の木箱削除
                     Destroy(this.gameObject);

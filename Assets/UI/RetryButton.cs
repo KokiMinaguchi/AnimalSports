@@ -7,20 +7,14 @@ namespace SleepingAnimals
 {
     public class RetryButton : BaseButton
     {
-
         // Start is called before the first frame update
         protected override void Start()
         {
             base.Start();
 
-            _button.OnButtonClicked.AsObservable().Subscribe(button =>
+            _button.OnButtonClicked.AsObservable().Subscribe(_ =>
             {
-                // タイトル画面に戻り、完了後にキャンバスグループの設定を変更する
-                //_stageSelectCanvas.interactable = false;
-                //_stageSelectCanvas.blocksRaycasts = false;
-                //_stageSelectCanvas.DOFade(0.0f, _fadeTime);
-                //_titleCanvas.DOFade(1.0f, _fadeTime).OnComplete(ValidUI);
-
+                SoundManager.Instance.PlaySE(SoundManager.systemDeside);
                 SceneTransitionManager.Instance.ChangeScene("GameScene");
             })
             .AddTo(this);

@@ -19,6 +19,7 @@ namespace SleepingAnimals
                 .AsObservable()
                 .Subscribe(_ =>
             {
+                SoundManager.Instance.PlaySE(SoundManager.systemDeside);
                 // ƒ^ƒCƒgƒ‹‰æ–Ê‚É–ß‚é
                 SceneTransitionManager.Instance.ChangeScene("TitleScene");
             })

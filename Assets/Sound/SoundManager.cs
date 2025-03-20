@@ -108,19 +108,25 @@ public sealed class SoundManager : SingletonMonoBehaviour<SoundManager>
 
     #endregion
     
-    public const string Cancel000 = "SE/cancel000";
-    public const string Coin000 = "SE/coin000";
-    public const string bgm000 = "BGM/bgm000";
-    public const string bgm001 = "BGM/bgm001";
+    public const string woodClash = "SE/CrashWoodBigWoodCrash01";
+    public const string systemDeside = "SE/se_maoudamashii_system49";
+    public const string explosion = "SE/Explosion";
+    public const string titleBGM = "BGM/Title_BGM";
+    public const string gameBGM = "BGM/Game_BGM";
+    public const string resultBGM = "BGM/Result_BGM";
 
     #region Unity
 
     protected override void Awake()
     {
         base.Awake();
-        audioDictionary.Add(Cancel000, Resources.Load(Cancel000) as AudioClip);
-        audioDictionary.Add(bgm000, Resources.Load(bgm000) as AudioClip);
-        audioDictionary.Add(bgm001, Resources.Load(bgm001) as AudioClip);
+        // TODO ファオルダ内のファイルをすべて読み込むようにする
+        audioDictionary.Add(woodClash, Resources.Load(woodClash) as AudioClip);
+        audioDictionary.Add(systemDeside, Resources.Load(systemDeside) as AudioClip);
+        audioDictionary.Add(explosion, Resources.Load(explosion) as AudioClip);
+        audioDictionary.Add(gameBGM, Resources.Load(gameBGM) as AudioClip);
+        audioDictionary.Add(titleBGM, Resources.Load(titleBGM) as AudioClip);
+        audioDictionary.Add(resultBGM, Resources.Load(resultBGM) as AudioClip);
     }
 
     private void Start()
@@ -138,6 +144,10 @@ public sealed class SoundManager : SingletonMonoBehaviour<SoundManager>
 
     #endregion
 
+    /// <summary>
+    /// 音声ファイル設定（実行ファイルには入れれないかも）
+    /// </summary>
+    /// <param name="audioClip"></param>
     public void AudioParameterSetting(AudioClip audioClip)
     {
         // 共通設定
@@ -149,13 +159,13 @@ public sealed class SoundManager : SingletonMonoBehaviour<SoundManager>
         // BGMはバックグラウンド読み込みに設定
         // 
         // 個別設定
-        AudioImporterSampleSettings audioImporterSampleSettings;
-        audioImporterSampleSettings.compressionFormat = AudioCompressionFormat.Vorbis;
-        audioImporterSampleSettings.quality = 100.0f;
-        audioImporterSampleSettings.sampleRateSetting = AudioSampleRateSetting.OverrideSampleRate;
-        audioImporterSampleSettings.sampleRateOverride = 44100;
-        // 
-        audioImporterSampleSettings.loadType = AudioClipLoadType.CompressedInMemory;
+        //AudioImporterSampleSettings audioImporterSampleSettings;
+        //audioImporterSampleSettings.compressionFormat = AudioCompressionFormat.Vorbis;
+        //audioImporterSampleSettings.quality = 100.0f;
+        //audioImporterSampleSettings.sampleRateSetting = AudioSampleRateSetting.OverrideSampleRate;
+        //audioImporterSampleSettings.sampleRateOverride = 44100;
+        //// 
+        //audioImporterSampleSettings.loadType = AudioClipLoadType.CompressedInMemory;
         // BGM,VoiceなどはStreamingに設定
     }
 
@@ -212,6 +222,8 @@ public sealed class SoundManager : SingletonMonoBehaviour<SoundManager>
     {
         foreach (var audioPlayer in _audioPlayerBGM)
         {
+            Debug.Log(audioPlayer.Clip.name);
+            Debug.Log(Path.GetFileNameWithoutExtension(audioName));
             if (audioPlayer.Clip.name == Path.GetFileNameWithoutExtension(audioName))
             {
                 audioPlayer.Stop();
